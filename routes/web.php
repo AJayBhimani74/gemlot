@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\SellerController as AdminSellerController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\DashboardController;
@@ -25,4 +26,13 @@ Route::middleware(['auth', 'role:seller', 'approved'])
     ->name('seller.')
     ->group(function () {
         Route::resource('stones', StoneController::class)->except('show');
+    });
+
+Route::middleware(['auth', 'role:admin'])
+    ->prefix('admin')
+    ->name('admin.')
+    ->group(function () {
+        Route::get('/sellers', [AdminSellerController::class, 'index'])->name('sellers.index');
+        Route::post('/sellers/{seller}/approve', [AdminSellerController::class, 'approve'])->name('sellers.approve');
+        Route::post('/sellers/{seller}/revoke', [AdminSellerController::class, 'revoke'])->name('sellers.revoke');
     });
