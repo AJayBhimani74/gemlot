@@ -13,7 +13,9 @@ use Laravel\Sanctum\HasApiTokens;
 class User extends Authenticatable
 {
     public const ROLE_BUYER = 'buyer';
+
     public const ROLE_SELLER = 'seller';
+
     public const ROLE_ADMIN = 'admin';
 
     /** @use HasFactory<UserFactory> */

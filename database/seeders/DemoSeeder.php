@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\Inquiry;
-use App\Models\Order;
 use App\Models\Stone;
 use App\Models\User;
 use App\Services\OrderService;

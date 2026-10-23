@@ -12,6 +12,7 @@ class CatalogueTest extends TestCase
     use RefreshDatabase;
 
     private User $buyer;
+
     private User $seller;
 
     protected function setUp(): void

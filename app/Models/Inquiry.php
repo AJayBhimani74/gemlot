@@ -15,8 +15,11 @@ class Inquiry extends Model
     use HasFactory;
 
     public const STATUS_OPEN = 'open';
+
     public const STATUS_ACCEPTED = 'accepted';
+
     public const STATUS_DECLINED = 'declined';
+
     public const STATUS_WITHDRAWN = 'withdrawn';
 
     protected $fillable = ['stone_id', 'buyer_id', 'message', 'offered_price', 'status', 'responded_at'];

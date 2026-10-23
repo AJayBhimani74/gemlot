@@ -8,6 +8,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\InquiryController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\Seller\StoneController;
+use App\Models\Order;
 use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'home')->name('home');
@@ -61,6 +62,6 @@ Route::middleware(['auth', 'role:buyer,seller,admin'])->group(function () {
     Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
     Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
     Route::post('/orders/{order}/{action}', [OrderController::class, 'transition'])
-        ->whereIn('action', array_keys(\App\Models\Order::ACTIONS))
+        ->whereIn('action', array_keys(Order::ACTIONS))
         ->name('orders.transition');
 });

@@ -17,13 +17,19 @@ class Stone extends Model
     use HasFactory, SoftDeletes;
 
     public const STATUS_AVAILABLE = 'available';
+
     public const STATUS_ON_HOLD = 'on_hold';
+
     public const STATUS_SOLD = 'sold';
 
     public const SHAPES = ['Round', 'Princess', 'Cushion', 'Emerald', 'Oval', 'Pear', 'Marquise', 'Radiant', 'Heart'];
+
     public const COLORS = ['D', 'E', 'F', 'G', 'H', 'I', 'J', 'K'];
+
     public const CLARITIES = ['FL', 'IF', 'VVS1', 'VVS2', 'VS1', 'VS2', 'SI1', 'SI2'];
+
     public const CUTS = ['Ideal', 'Excellent', 'Very Good', 'Good'];
+
     public const LABS = ['GIA', 'IGI', 'HRD'];
 
     protected $fillable = [

@@ -1,5 +1,8 @@
 <?php
 
+use App\Http\Middleware\EnsureApproved;
+use App\Http\Middleware\EnsureRole;
+use App\Http\Middleware\ForceJson;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -12,11 +15,11 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        $middleware->prependToGroup('api', \App\Http\Middleware\ForceJson::class);
+        $middleware->prependToGroup('api', ForceJson::class);
 
         $middleware->alias([
-            'role' => \App\Http\Middleware\EnsureRole::class,
-            'approved' => \App\Http\Middleware\EnsureApproved::class,
+            'role' => EnsureRole::class,
+            'approved' => EnsureApproved::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

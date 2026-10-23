@@ -13,7 +13,9 @@ class InquiryTest extends TestCase
     use RefreshDatabase;
 
     private User $buyer;
+
     private User $seller;
+
     private Stone $stone;
 
     protected function setUp(): void
