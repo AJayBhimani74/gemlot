@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\SellerController as AdminSellerController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\CatalogueController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Seller\StoneController;
 use Illuminate\Support\Facades\Route;
@@ -36,3 +37,8 @@ Route::middleware(['auth', 'role:admin'])
         Route::post('/sellers/{seller}/approve', [AdminSellerController::class, 'approve'])->name('sellers.approve');
         Route::post('/sellers/{seller}/revoke', [AdminSellerController::class, 'revoke'])->name('sellers.revoke');
     });
+
+Route::middleware(['auth', 'role:buyer,admin'])->group(function () {
+    Route::get('/stones', [CatalogueController::class, 'index'])->name('catalogue.index');
+    Route::get('/stones/{stone}', [CatalogueController::class, 'show'])->name('catalogue.show');
+});
