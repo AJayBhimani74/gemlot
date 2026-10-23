@@ -66,6 +66,8 @@
                             <div class="thumb">
                                 @if ($stone->image_url)
                                     <img src="{{ $stone->image_url }}" alt="{{ $stone->shape }} {{ $stone->carat }}ct">
+                                @else
+                                    <span class="placeholder">{{ $stone->shape }}</span>
                                 @endif
                             </div>
                             <div class="info">
