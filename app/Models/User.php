@@ -63,6 +63,11 @@ class User extends Authenticatable
         return $this->hasMany(Stone::class, 'seller_id');
     }
 
+    public function inquiries(): HasMany
+    {
+        return $this->hasMany(Inquiry::class, 'buyer_id');
+    }
+
     public function hasRole(string ...$roles): bool
     {
         return in_array($this->role, $roles, true);
