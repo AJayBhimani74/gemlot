@@ -72,6 +72,41 @@ class Stone extends Model
         return $query->where('status', self::STATUS_AVAILABLE);
     }
 
+    public const SORTS = [
+        'newest' => ['created_at', 'desc'],
+        'price_asc' => ['total_price', 'asc'],
+        'price_desc' => ['total_price', 'desc'],
+        'carat_asc' => ['carat', 'asc'],
+        'carat_desc' => ['carat', 'desc'],
+    ];
+
+    /**
+     * Apply the catalogue filters. Unknown or empty values are ignored.
+     */
+    public function scopeFilter(Builder $query, array $filters): Builder
+    {
+        $multi = fn (string $key, array $allowed) => array_values(
+            array_intersect((array) ($filters[$key] ?? []), $allowed)
+        );
+
+        return $query
+            ->when($multi('shape', self::SHAPES), fn ($q, $v) => $q->whereIn('shape', $v))
+            ->when($multi('color', self::COLORS), fn ($q, $v) => $q->whereIn('color', $v))
+            ->when($multi('clarity', self::CLARITIES), fn ($q, $v) => $q->whereIn('clarity', $v))
+            ->when($multi('lab', self::LABS), fn ($q, $v) => $q->whereIn('lab', $v))
+            ->when(is_numeric($filters['carat_min'] ?? null), fn ($q) => $q->where('carat', '>=', $filters['carat_min']))
+            ->when(is_numeric($filters['carat_max'] ?? null), fn ($q) => $q->where('carat', '<=', $filters['carat_max']))
+            ->when(is_numeric($filters['price_min'] ?? null), fn ($q) => $q->where('total_price', '>=', $filters['price_min']))
+            ->when(is_numeric($filters['price_max'] ?? null), fn ($q) => $q->where('total_price', '<=', $filters['price_max']));
+    }
+
+    public function scopeSortBy(Builder $query, ?string $sort): Builder
+    {
+        [$column, $direction] = self::SORTS[$sort] ?? self::SORTS['newest'];
+
+        return $query->orderBy($column, $direction)->orderBy('id', 'desc');
+    }
+
     public function getImageUrlAttribute(): ?string
     {
         return $this->image_path ? Storage::disk('public')->url($this->image_path) : null;
