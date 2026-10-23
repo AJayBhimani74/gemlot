@@ -2,12 +2,17 @@
 
 namespace App\Models;
 
+use Database\Factories\InquiryFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Inquiry extends Model
 {
+    /** @use HasFactory<InquiryFactory> */
+    use HasFactory;
+
     public const STATUS_OPEN = 'open';
     public const STATUS_ACCEPTED = 'accepted';
     public const STATUS_DECLINED = 'declined';
