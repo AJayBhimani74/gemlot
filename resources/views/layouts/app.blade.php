@@ -12,6 +12,9 @@
         <nav class="links">
             @auth
                 <a href="{{ route('dashboard') }}">Dashboard</a>
+                @if (auth()->user()->hasRole('admin'))
+                    <a href="{{ route('admin.sellers.index') }}">Sellers</a>
+                @endif
                 @if (auth()->user()->isSeller() && auth()->user()->is_approved)
                     <a href="{{ route('seller.stones.index') }}">My stones</a>
                 @endif
