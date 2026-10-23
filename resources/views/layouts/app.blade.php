@@ -15,6 +15,10 @@
                 @if (auth()->user()->hasRole('buyer', 'admin'))
                     <a href="{{ route('catalogue.index') }}">Catalogue</a>
                 @endif
+                @if (auth()->user()->hasRole('buyer', 'seller'))
+                    <a href="{{ route('inquiries.index') }}">Inquiries</a>
+                @endif
+                <a href="{{ route('orders.index') }}">Orders</a>
                 @if (auth()->user()->hasRole('admin'))
                     <a href="{{ route('admin.sellers.index') }}">Sellers</a>
                 @endif
@@ -36,6 +40,12 @@
         @if (session('status'))
             <div class="flash">{{ session('status') }}</div>
         @endif
+
+        @foreach (['inquiry', 'order'] as $key)
+            @error($key)
+                <div class="flash flash-error">{{ $message }}</div>
+            @enderror
+        @endforeach
 
         @yield('content')
     </main>
