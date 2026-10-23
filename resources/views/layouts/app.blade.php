@@ -12,6 +12,9 @@
         <nav class="links">
             @auth
                 <a href="{{ route('dashboard') }}">Dashboard</a>
+                @if (auth()->user()->hasRole('buyer', 'admin'))
+                    <a href="{{ route('catalogue.index') }}">Catalogue</a>
+                @endif
                 @if (auth()->user()->hasRole('admin'))
                     <a href="{{ route('admin.sellers.index') }}">Sellers</a>
                 @endif
