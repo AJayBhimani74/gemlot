@@ -31,6 +31,21 @@
             @if ($stone->notes)
                 <p>{{ $stone->notes }}</p>
             @endif
+
+            @if (auth()->user()->isBuyer())
+                <form method="POST" action="{{ route('inquiries.store', $stone) }}">
+                    @csrf
+                    <label for="offered_price">Your offer (USD, optional)</label>
+                    <input id="offered_price" name="offered_price" type="number" step="0.01" value="{{ old('offered_price') }}">
+                    @error('offered_price') <div class="error">{{ $message }}</div> @enderror
+
+                    <label for="message">Message</label>
+                    <textarea id="message" name="message" rows="3">{{ old('message') }}</textarea>
+                    @error('message') <div class="error">{{ $message }}</div> @enderror
+
+                    <button class="btn" type="submit">Send inquiry</button>
+                </form>
+            @endif
         </div>
     </div>
 @endsection
