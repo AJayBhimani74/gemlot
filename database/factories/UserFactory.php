@@ -33,6 +33,26 @@ class UserFactory extends Factory
         ];
     }
 
+    public function seller(): static
+    {
+        return $this->state(fn () => [
+            'role' => User::ROLE_SELLER,
+            'company_name' => fake()->company(),
+            'country' => fake()->countryCode(),
+            'is_approved' => true,
+        ]);
+    }
+
+    public function buyer(): static
+    {
+        return $this->state(fn () => [
+            'role' => User::ROLE_BUYER,
+            'company_name' => fake()->company(),
+            'country' => fake()->countryCode(),
+            'is_approved' => true,
+        ]);
+    }
+
     /**
      * Indicate that the model's email address should be unverified.
      */
