@@ -75,3 +75,11 @@ input:focus, select:focus, textarea:focus { outline: 2px solid #c7d4fb; border-c
 .flash { background: #e8f5e9; border: 1px solid #c8e6c9; padding: 10px 14px; border-radius: 6px; margin-bottom: 16px; }
 .muted { color: var(--muted); }
 .badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 12px; background: #eef1f8; }
+
+.head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.head .btn { margin-top: 0; }
+table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+th, td { text-align: left; padding: 9px 8px; border-bottom: 1px solid var(--line); }
+th { font-size: 12px; text-transform: uppercase; color: var(--muted); letter-spacing: .03em; }
+td.actions { display: flex; gap: 12px; justify-content: flex-end; }
+.pagination { display: flex; gap: 6px; list-style: none; padding: 0; margin-top: 16px; }

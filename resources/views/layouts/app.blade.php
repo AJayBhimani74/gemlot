@@ -12,6 +12,9 @@
         <nav class="links">
             @auth
                 <a href="{{ route('dashboard') }}">Dashboard</a>
+                @if (auth()->user()->isSeller() && auth()->user()->is_approved)
+                    <a href="{{ route('seller.stones.index') }}">My stones</a>
+                @endif
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
                     <button class="link-btn" type="submit">Log out</button>
