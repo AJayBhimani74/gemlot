@@ -1,59 +1,139 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Gemlot
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A small B2B marketplace where sellers list wholesale gemstones and trade buyers browse, make offers and place orders. It is a portfolio project built with Laravel 12 and MySQL, covering the parts of trading platforms I have worked on before: role-based access, search and filtering, an approval flow for sellers, an order lifecycle, and a REST API for a mobile app.
 
-## About Laravel
+It is a demo and is not connected to any real business or client.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+![Catalogue](docs/screenshots/catalogue.png)
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## What it does
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- **Three roles.** Buyers, sellers and admins, each with their own pages and permissions.
+- **Seller approval.** New sellers can register straight away but cannot list anything until an admin approves them.
+- **Stone listings.** Sellers manage their own stock, with photo upload and a price per carat. The total price is stored so it can be filtered and sorted in SQL.
+- **Catalogue.** Buyers filter by shape, colour, clarity, lab, carat range and total price, and sort by price, carat or newest. Only available stones from approved sellers show up.
+- **Inquiries and offers.** A buyer can ask about a stone and optionally name a price.
+- **Orders.** When a seller accepts an inquiry the stone is put on hold and an order is created. The order then moves through confirmed, shipped and completed, or can be cancelled.
+- **REST API.** Token login (Sanctum), the same catalogue filters, inquiries and orders, so a mobile app can do everything a buyer or seller can do on the website.
 
-## Learning Laravel
+| Stone page | Seller stock | Seller inquiries |
+|---|---|---|
+| ![](docs/screenshots/stone-detail.png) | ![](docs/screenshots/seller-stones.png) | ![](docs/screenshots/seller-inquiries.png) |
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+## Order lifecycle
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+```
+            confirm (seller)     ship (seller)     complete (buyer)
+ pending ───────────────▶ confirmed ─────────▶ shipped ──────────────▶ completed
+    │                        │
+    └──── cancel (buyer or seller) ────┘
+                 │
+                 ▼
+             cancelled   (the stone goes back on sale)
+```
 
-## Laravel Sponsors
+The rules live in one place, `Order::ACTIONS`: which statuses each step can start from, where it ends up, and who may trigger it. The policy, the views and the API all read from it, so they cannot drift apart.
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+Accepting an inquiry runs in a transaction with row locks on the stone and the inquiry. That stops two accepts from both winning the same stone. Accepting also declines any other open inquiries on that stone.
 
-### Premium Partners
+## Getting started
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+You need PHP 8.2+, Composer and Docker (for MySQL).
 
-## Contributing
+```bash
+git clone git@github.com:AJayBhimani74/gemlot.git
+cd gemlot
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+composer install
+cp .env.example .env
+php artisan key:generate
 
-## Code of Conduct
+docker compose up -d          # MySQL 8.4 on port 3307
+php artisan migrate --seed    # tables and an admin user
+php artisan db:seed --class=DemoSeeder   # optional sample data
+php artisan storage:link
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+php artisan serve
+```
 
-## Security Vulnerabilities
+Then open http://localhost:8000.
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+### Demo accounts
 
-## License
+All demo accounts use the password `password`.
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+| Role | Email |
+|---|---|
+| Admin | admin@gemlot.test |
+| Seller (approved) | anil@mehtagems.test |
+| Seller (waiting for approval) | wei@pearlriver.test |
+| Buyer | maria@rossijoyas.test |
+
+## API
+
+Base path `/api/v1`. All responses are JSON, including errors.
+
+```bash
+# log in and get a token
+curl -X POST http://localhost:8000/api/v1/auth/login \
+  -H 'Content-Type: application/json' \
+  -d '{"email":"maria@rossijoyas.test","password":"password","device_name":"my-phone"}'
+
+# browse round stones, cheapest first
+curl 'http://localhost:8000/api/v1/stones?shape[]=Round&sort=price_asc' \
+  -H 'Authorization: Bearer <token>'
+```
+
+| Method | Path | Who | Purpose |
+|---|---|---|---|
+| POST | `/auth/login` | anyone | Exchange credentials for a token (rate limited) |
+| POST | `/auth/logout` | any | Revoke the current token |
+| GET | `/me` | any | Current user |
+| GET | `/stones` | buyer, admin | Catalogue with filters, sorting and pagination |
+| GET | `/stones/{id}` | buyer, admin | Stone detail |
+| POST | `/stones/{id}/inquiries` | buyer | Send an inquiry or offer |
+| GET | `/inquiries` | buyer, seller | Your inquiries (sent or received) |
+| POST | `/inquiries/{id}/withdraw` | buyer | Withdraw an open inquiry |
+| POST | `/inquiries/{id}/accept` | seller | Accept and create an order |
+| POST | `/inquiries/{id}/decline` | seller | Decline |
+| GET | `/orders`, `/orders/{id}` | buyer, seller, admin | Your orders |
+| POST | `/orders/{id}/{action}` | buyer, seller | `confirm`, `ship`, `complete` or `cancel` |
+
+Each order in a response includes `available_actions`, the steps the current user can take right now, so a client can show only the buttons that make sense.
+
+Catalogue filters: `shape[]`, `color[]`, `clarity[]`, `lab[]`, `carat_min`, `carat_max`, `price_min`, `price_max`, plus `sort` (`newest`, `price_asc`, `price_desc`, `carat_asc`, `carat_desc`) and `per_page` (max 50).
+
+## Tests
+
+```bash
+php artisan test
+vendor/bin/pint --test    # code style
+```
+
+The suite has around 70 tests. They run on in-memory SQLite, so they never touch the development database. They cover registration and login, seller permissions, the approval gate, every catalogue filter, the full order lifecycle including a table of who may do what at each status, and the API. GitHub Actions runs the style check and the tests on PHP 8.2 and 8.3 for every push.
+
+## Project layout
+
+```
+app/
+  Http/Controllers/          web controllers (Auth, Seller, Admin) and Api/V1
+  Http/Middleware/           role and approval checks
+  Http/Resources/            API response shapes
+  Models/                    Stone, Inquiry, Order, User, with query scopes
+  Policies/                  who may act on which stone, inquiry or order
+  Services/OrderService.php  accepting inquiries and moving orders along
+database/                    migrations, factories, seeders
+tests/                      Feature (web and Api) and Unit
+```
+
+## Decisions worth mentioning
+
+- **Business rules are not in controllers.** Both the website and the API call `OrderService`, so there is one implementation of what accepting or shipping means.
+- **Shared query scopes.** `catalogue()`, `filter()`, `sortBy()` and `visibleTo()` are used by both the web and API controllers.
+- **Policies over inline checks.** Ownership and state rules (a seller can only edit their own stones, a sold stone cannot be deleted) are in policy classes and covered by tests.
+- **Soft deletes on stones.** Past orders and inquiries still point at a stone that has been removed.
+- **Whitelisted inputs.** Filter and sort values are checked against known lists, and unknown values are ignored.
+
+## Possible next steps
+
+Email notifications for new inquiries and order changes, an audit trail of status changes, image resizing, and per-seller sales reports.
