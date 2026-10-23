@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Database\Factories\OrderFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -70,6 +71,20 @@ class Order extends Model
     public function inquiry(): BelongsTo
     {
         return $this->belongsTo(Inquiry::class);
+    }
+
+    /**
+     * Admins see everything, everyone else only the orders they are a party to.
+     */
+    public function scopeVisibleTo(Builder $query, User $user): Builder
+    {
+        if ($user->hasRole(User::ROLE_ADMIN)) {
+            return $query;
+        }
+
+        return $query->where(
+            fn ($w) => $w->where('buyer_id', $user->id)->orWhere('seller_id', $user->id)
+        );
     }
 
     public function partyFor(User $user): ?string

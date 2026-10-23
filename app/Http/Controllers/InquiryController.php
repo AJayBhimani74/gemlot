@@ -18,11 +18,7 @@ class InquiryController extends Controller
 
         $inquiries = Inquiry::query()
             ->with(['stone', 'buyer:id,name,company_name'])
-            ->when(
-                $user->isSeller(),
-                fn ($q) => $q->whereHas('stone', fn ($s) => $s->where('seller_id', $user->id)),
-                fn ($q) => $q->where('buyer_id', $user->id),
-            )
+            ->visibleTo($user)
             ->latest()
             ->paginate(15);
 

@@ -72,6 +72,16 @@ class Stone extends Model
         return $query->where('status', self::STATUS_AVAILABLE);
     }
 
+    /**
+     * What buyers are allowed to see: available stones from approved sellers.
+     */
+    public function scopeCatalogue(Builder $query): Builder
+    {
+        return $query
+            ->available()
+            ->whereHas('seller', fn ($q) => $q->where('is_approved', true));
+    }
+
     public const SORTS = [
         'newest' => ['created_at', 'desc'],
         'price_asc' => ['total_price', 'asc'],

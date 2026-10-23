@@ -15,8 +15,7 @@ class CatalogueController extends Controller
         ]);
 
         $stones = Stone::query()
-            ->available()
-            ->whereHas('seller', fn ($q) => $q->where('is_approved', true))
+            ->catalogue()
             ->filter($filters)
             ->sortBy($request->query('sort'))
             ->paginate(12)

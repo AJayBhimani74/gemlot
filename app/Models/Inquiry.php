@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Database\Factories\InquiryFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -41,6 +42,16 @@ class Inquiry extends Model
     public function order(): HasOne
     {
         return $this->hasOne(Order::class);
+    }
+
+    /**
+     * Sellers see inquiries on their stones, buyers see the ones they sent.
+     */
+    public function scopeVisibleTo(Builder $query, User $user): Builder
+    {
+        return $user->isSeller()
+            ? $query->whereHas('stone', fn ($s) => $s->where('seller_id', $user->id))
+            : $query->where('buyer_id', $user->id);
     }
 
     public function isOpen(): bool

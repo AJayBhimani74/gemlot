@@ -17,9 +17,7 @@ class OrderController extends Controller
 
         $orders = Order::query()
             ->with(['stone', 'buyer:id,company_name', 'seller:id,company_name'])
-            ->when(! $user->hasRole('admin'), fn ($q) => $q->where(
-                fn ($w) => $w->where('buyer_id', $user->id)->orWhere('seller_id', $user->id)
-            ))
+            ->visibleTo($user)
             ->latest()
             ->paginate(15);
 
